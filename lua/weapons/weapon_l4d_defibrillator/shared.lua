@@ -60,39 +60,44 @@ end
 function SWEP:ResetProgress(defibtarget)
 	if self.HasFinishedReviving then return end
 	if IsValid(self.Owner) then
-	self.Owner:DrawViewModel(true)
+		self.Owner:DrawViewModel(true)
 	end
 	if SERVER then
-	if IsValid(self.Owner) then
-	self.Owner:DrawWorldModel(true)
-	if timer.Exists("L4D2_Defibrillator_ShockTimer_"..self.Owner:EntIndex()) then
-		timer.Remove("L4D2_Defibrillator_ShockTimer_"..self.Owner:EntIndex())
-	end
-	if timer.Exists("L4D2_Defibrillator_RevivalTimer_"..self.Owner:EntIndex()) then
-		timer.Remove("L4D2_Defibrillator_RevivalTimer_"..self.Owner:EntIndex())
-	end
-	end
-	if IsValid(self.Owner) and IsValid(self.Owner:GetActiveWeapon()) and self.Owner:GetActiveWeapon() == self then
-	self:SetNoDraw(true)
-	end
-	if IsValid(self.Owner) and self.Owner:GetNoDraw() and self.Owner.DefibModelNoDraw then self.Owner:SetNoDraw(false) self.Owner.DefibModelNoDraw = nil end
-	--self.DefibrillatorProgress = 0
-	self.DefibrillatorFailTarget = self.DefibrillatorTarget
-	self.DefibrillatorTarget = nil
-	self.RevivingBody = nil
-	if IsValid(self.Owner) and self.Owner:GetWalkSpeed() <= 1 and self.DefibModelStoredWalkSpeed then
-		self.Owner:SetWalkSpeed(self.DefibModelStoredWalkSpeed)
-	end
-	if IsValid(self.Owner) and self.Owner:GetRunSpeed() <= 1 and self.DefibModelStoredRunSpeed then
-		self.Owner:SetRunSpeed(self.DefibModelStoredRunSpeed)
-	end
-	if IsValid(self.Owner) and self.Owner:GetJumpPower() <= 1 and self.DefibModelStoredJumpPower then
-		self.Owner:SetJumpPower(self.DefibModelStoredJumpPower)
-	end
-	self.ReachedHalfwayState = nil
-	if IsValid(self.Owner) and IsValid(self.Owner.DeathModelDefibAnim) then self.Owner.DeathModelDefibAnim:Remove() end
-	if IsValid(self.Owner) and IsValid(self.Owner.DeathModelDefibAnimProp) then self.Owner.DeathModelDefibAnimProp:Remove() end
-	if self.DefibrillatorSound then self.Owner:StopSound("L4D2_Defibrillator_StartSound") self.DefibrillatorSound = nil end
+		if IsValid(self.Owner) then
+			self.Owner:DrawWorldModel(true)
+			if timer.Exists("L4D2_Defibrillator_ShockTimer_"..self.Owner:EntIndex()) then
+				timer.Remove("L4D2_Defibrillator_ShockTimer_"..self.Owner:EntIndex())
+			end
+			if timer.Exists("L4D2_Defibrillator_RevivalTimer_"..self.Owner:EntIndex()) then
+				timer.Remove("L4D2_Defibrillator_RevivalTimer_"..self.Owner:EntIndex())
+			end
+		end
+		if IsValid(self.Owner) and IsValid(self.Owner:GetActiveWeapon()) and self.Owner:GetActiveWeapon() == self then
+			self:SetNoDraw(true)
+		end
+		if IsValid(self.Owner) and self.Owner:GetNoDraw() and self.Owner.DefibModelNoDraw then
+			self.Owner:SetNoDraw(false)
+			self.Owner.DefibModelNoDraw = nil
+		end
+		
+		--self.DefibrillatorProgress = 0
+		self.DefibrillatorFailTarget = self.DefibrillatorTarget
+		self.DefibrillatorTarget = nil
+		self.RevivingBody = nil
+		if IsValid(self.Owner) and self.Owner:GetWalkSpeed() <= 1 and self.DefibModelStoredWalkSpeed then
+			self.Owner:SetWalkSpeed(self.DefibModelStoredWalkSpeed)
+		end
+		if IsValid(self.Owner) and self.Owner:GetRunSpeed() <= 1 and self.DefibModelStoredRunSpeed then
+			self.Owner:SetRunSpeed(self.DefibModelStoredRunSpeed)
+		end
+		if IsValid(self.Owner) and self.Owner:GetJumpPower() <= 1 and self.DefibModelStoredJumpPower then
+			self.Owner:SetJumpPower(self.DefibModelStoredJumpPower)
+		end
+		self.ReachedHalfwayState = nil
+		if IsValid(self.Owner) and IsValid(self.Owner.DeathModelDefibAnim) then self.Owner.DeathModelDefibAnim:Remove() end
+		if IsValid(self.Owner) and IsValid(self.Owner.DeathModelDefibAnimProp) then self.Owner.DeathModelDefibAnimProp:Remove() end
+		
+		if self.DefibrillatorSound then self.Owner:StopSound("L4D2_Defibrillator_StartSound") self.DefibrillatorSound = nil end
 	end
 end
 
@@ -137,9 +142,9 @@ function SWEP:BeginProgress(defibtarget)
 			end
 			self.Owner.DeathModelDefibAnim:SetModel(model)
 			if self.Owner:Crouching() then
-			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "Defibrillate_Incap_Crouching")
+			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "ACT_TERROR_CROUCH_USE_DEFIBRILLATOR")
 			else
-			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "Defibrillate_Incap_Standing")
+			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "ACT_TERROR_USE_DEFIBRILLATOR")
 			end
 		self.Owner.DeathModelDefibAnim:SetPos( self.Owner:GetPos() )
 		local p_ang = self.Owner:GetAngles()
@@ -150,9 +155,9 @@ function SWEP:BeginProgress(defibtarget)
 		self.Owner.DeathModelDefibAnim:SetKeyValue("solid", "0")
 		--self.Owner.DeathModelDefibAnim:SetParent(self.Owner)
 		if self.Owner:Crouching() then
-			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "Defibrillate_Incap_Crouching")
+			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "ACT_TERROR_CROUCH_USE_DEFIBRILLATOR")
 		else
-			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "Defibrillate_Incap_Standing")
+			self.Owner.DeathModelDefibAnim:Fire("SetAnimation", "ACT_TERROR_USE_DEFIBRILLATOR")
 		end
 	end
 	if !IsValid(self.Owner.DeathModelDefibAnimProp) then -- Visible Prop
@@ -384,7 +389,7 @@ function SWEP:SecondaryAttack()
 			end
 		end
 	end
-	self.Owner:GetViewModel():SendViewModelMatchingSequence( self:LookupSequence("melee") )
+	self.Owner:GetViewModel():SendViewModelMatchingSequence(self:LookupSequence("ACT_VM_MELEE"))
 	--[[local sound_random = { 1, 2 }
 	if sound_random == 1 then
 		self.Owner:EmitSound("player/survivor/swing/swish_weaponswing_swipe5.wav")

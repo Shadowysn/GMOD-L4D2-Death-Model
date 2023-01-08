@@ -10,7 +10,7 @@ function ENT:AcceptInput( input, activator, caller, param )
 		self:RespawnOwner()
 		return true
 	elseif input_compare == "shock" then
-		self:ResetSequence("defib_jolt")
+		self:ResetSequence(self:LookupSequence("ACT_TERROR_DEFIBRILLATOR_SHOCK"))
 		local function ShockEffect()
 			if !IsValid(self) or !IsValid(self.VisModel) then return end
 			local effect = EffectData()
@@ -65,25 +65,33 @@ function ENT:Initialize()
 			--timer.Simple(0, function()
 			if self.DeathModelAnimType == 1 then
 				if self:GetModel() == "models/defib/survivor_teenangst.mdl" and table.Random({1,2}) == 2 then
-					self:ResetSequence( "Die_Incap" )
+					self:ResetSequence(self:LookupSequence("ACT_DIE_INCAP"))
 					self:SetPlaybackRate(0)
 					timer.Simple(0.1,function()
 						if !IsValid(self) then return end
-						self:ResetSequence( "Death" )
+						self:ResetSequence(self:LookupSequence("ACT_DEATH"))
 						self:SetPlaybackRate(99999999999999999999)
 					end)
 				else
-					self:ResetSequence( "Die_Incap" )
+					self:ResetSequence(self:LookupSequence("ACT_DIE_INCAP"))
 					net.Start("L4D2_DeathModel_SetClientSideAnimation")
 					net.WriteEntity(self)
 					net.Broadcast()
 				end
 			else
-				if GetConVar("sv_l4d2_bonus_features"):GetBool() and table.Random({1,2}) == 2 then
-					self:ResetSequence( "Death" )
+				local randSeed = {1, 2, 3}
+				randSeed = randSeed[ math.random( #randSeed ) ]
+				if GetConVar("sv_l4d2_bonus_features"):GetBool() and randSeed != 1 then
+					local incapSeq = self:LookupSequence("ACT_DIESIMPLE")
+					if (randSeed == 3 and incapSeq != 0) then
+						self:ResetSequence(incapSeq)
+					else
+						self:ResetSequence(self:LookupSequence("ACT_DEATH"))
+					end
 				else
-					self:ResetSequence( "Die_Standing" )
+					self:ResetSequence(self:LookupSequence("ACT_DIE_STANDING"))
 				end
+				
 				net.Start("L4D2_DeathModel_SetClientSideAnimation")
 				net.WriteEntity(self)
 				net.Broadcast()
@@ -106,10 +114,17 @@ function ENT:Initialize()
 		end
 	end--]] -- This function does not work.
 	if !IsValid(self.DeathModelOwner) or !self.DeathModelOwner:IsPlayer() then
-		if GetConVar("sv_l4d2_bonus_features"):GetBool() and table.Random({1,2}) == 2 then
-			self:ResetSequence( "Death" )
+		local randSeed = {1, 2, 3}
+		randSeed = randSeed[ math.random( #randSeed ) ]
+		if GetConVar("sv_l4d2_bonus_features"):GetBool() and randSeed != 1 then
+			local incapSeq = self:LookupSequence("ACT_DIESIMPLE")
+			if (randSeed == 3 and incapSeq != 0) then
+				self:ResetSequence(incapSeq)
+			else
+				self:ResetSequence(self:LookupSequence("ACT_DEATH"))
+			end
 		else
-			self:ResetSequence( "Die_Standing" )
+			self:ResetSequence(self:LookupSequence("ACT_DIE_STANDING"))
 		end
 		--[[if self.DeathModelNPCString and self.DeathModelNPCString != nil then
 			

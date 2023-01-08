@@ -256,22 +256,22 @@ hook.Add("Tick", "L4D2_DeathModel_CheckIncap_Think", function()
 	for _,ent in pairs(player.GetAll()) do
 		if IsValid(ent) and ent:Alive() then
 			if IsValid(ent.DeathModelGetUp) then
-			if ent.WOS_InLastStand == true then
-				ent.DeathModelGetUp:Remove()
-				if ent:GetNoDraw() then 
-				ent:SetNoDraw(false)
+				if ent.WOS_InLastStand == true then
+					ent.DeathModelGetUp:Remove()
+					if ent:GetNoDraw() then 
+						ent:SetNoDraw(false)
+					end
+						ent.DeathModelOwnerNoDraw = nil
+					return
 				end
-				ent.DeathModelOwnerNoDraw = nil
-				return
-			end
-			ent.DeathModelGetUp:SetPos(ent:GetPos())
-			local p_ang = ent:GetAngles()
-			ent.DeathModelGetUp:SetAngles( Angle(0, p_ang.y, p_ang.r) )
+				ent.DeathModelGetUp:SetPos(ent:GetPos())
+				local p_ang = ent:GetAngles()
+				ent.DeathModelGetUp:SetAngles( Angle(0, p_ang.y, p_ang.r) )
 			end
 			if IsValid(ent.DeathModelDefibAnim) then
-			ent.DeathModelDefibAnim:SetPos(ent:GetPos())
+				ent.DeathModelDefibAnim:SetPos(ent:GetPos())
 			local p_ang = ent:GetAngles()
-			ent.DeathModelDefibAnim:SetAngles( Angle(0, p_ang.y, p_ang.r) )
+				ent.DeathModelDefibAnim:SetAngles( Angle(0, p_ang.y, p_ang.r) )
 			end
 		end
 		if IsValid(ent) and ent:Alive() and ent.WOS_InLastStand == true and ent.DeathModelIncapDeath != true then
@@ -335,35 +335,38 @@ hook.Add("PostPlayerDeath", "L4D2_DeathModel_Replace", function( player )
 	end
 	local rag = player:GetRagdollEntity()
 		if IsValid(rag) and !prevent_spawn then
-		rag:Remove()
-		if util.IsValidModel(player:GetModel()) and util.IsValidRagdoll(player:GetModel()) then
-		local deathmdl = ents.Create("survivor_death_model")
-			deathmdl:SetPos( player:GetPos() )
-			local p_ang = player:GetAngles()
-			deathmdl:SetAngles( Angle(0, p_ang.y, p_ang.r) )
-			deathmdl.DeathModelString = player:GetModel()
-			deathmdl.DeathModelOwner = player
-			if player.DeathModelIncapDeath == true then
-			deathmdl.DeathModelAnimType = 1
-			else
-			deathmdl.DeathModelAnimType = 0
-			end
-			player.DeathModelIncapDeath = nil
-			if (!ConVarExists("sv_l4d2_body_burn") or GetConVar("sv_l4d2_body_burn"):GetInt() > 0) then
-				if player.DeathModelBurningDeath == true then
-					deathmdl.DeathModelBurningDeath = true
-					deathmdl.DeathModelCannotRevive = true
+			rag:Remove()
+			if util.IsValidModel(player:GetModel()) and util.IsValidRagdoll(player:GetModel()) then
+			local deathmdl = ents.Create("survivor_death_model")
+				deathmdl:SetPos( player:GetPos() )
+				local p_ang = player:GetAngles()
+				deathmdl:SetAngles( Angle(0, p_ang.y, p_ang.r) )
+				deathmdl.DeathModelString = player:GetModel()
+				deathmdl.DeathModelOwner = player
+				
+				if player.DeathModelIncapDeath == true then
+					deathmdl.DeathModelAnimType = 1
+				else
+					deathmdl.DeathModelAnimType = 0
 				end
+				player.DeathModelIncapDeath = nil
+				
+				if (!ConVarExists("sv_l4d2_body_burn") or GetConVar("sv_l4d2_body_burn"):GetInt() > 0) then
+					if player.DeathModelBurningDeath == true then
+						deathmdl.DeathModelBurningDeath = true
+						deathmdl.DeathModelCannotRevive = true
+					end
+				end
+				player.DeathModelBurningDeath = nil
+				if IsValid(LatestBody) then
+					LatestBody.DeathModelIsLatest = nil
+				end
+				LatestBody = deathmdl
+				
+				deathmdl.DeathModelIsLatest = true
+				deathmdl:Spawn()
+				deathmdl:Activate()
 			end
-			player.DeathModelBurningDeath = nil
-			if IsValid(LatestBody) then
-				LatestBody.DeathModelIsLatest = nil
-			end
-			LatestBody = deathmdl
-			deathmdl.DeathModelIsLatest = true
-			deathmdl:Spawn()
-			deathmdl:Activate()
-		end
 		end
 	end
 	if IsValid(player.DeathModelGetUp) then
